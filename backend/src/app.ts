@@ -15,8 +15,8 @@ app.get("/api/health", (_req, res) => {
 });
 
 // Routes will be mounted here as we build each phase, e.g.:
-// import authRoutes from "./routes/auth.routes";
-// app.use("/api/auth", authRoutes);
+import authRoutes from "./routes/auth.routes";
+app.use("/api/auth", authRoutes);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {

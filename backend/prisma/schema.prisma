@@ -1,5 +1,9 @@
 // DocFinder database schema
 // Run `npx prisma migrate dev --name init` after setting DATABASE_URL in .env
+// npx prisma migrate dev --name center_doctor_pivot
+// npx prisma generate
+// restart the TS server: Ctrl+Shift+P → "TypeScript: Restart TS Server" → Enter.
+// npx prisma studio
 
 generator client {
   provider = "prisma-client-js"
@@ -12,14 +16,12 @@ datasource db {
 
 enum Role {
   PATIENT
-  DOCTOR
+  CENTER
   ADMIN
 }
 
 enum BookingStatus {
-  PENDING
-  CONFIRMED
-  COMPLETED
+  BOOKED
   CANCELLED
 }
 
@@ -28,79 +30,106 @@ model User {
   name          String
   email         String         @unique
   password      String
+  phone         String?
   role          Role
   createdAt     DateTime       @default(now())
 
-  doctorProfile DoctorProfile?
+  centerProfile CenterProfile?
   bookings      Booking[]      @relation("PatientBookings")
   reviews       Review[]
+  notifications Notification[]
 }
 
-model DoctorProfile {
-  id            String         @id @default(uuid())
-  userId        String         @unique
-  user          User           @relation(fields: [userId], references: [id])
+model CenterProfile {
+  id            String   @id @default(uuid())
+  userId        String   @unique
+  user          User     @relation(fields: [userId], references: [id])
 
-  specialty     String
-  city          String
-  clinicAddress String
-  fee           Int
+  city          String?
+  clinicAddress String?
   bio           String?
   photoUrl      String?
-  approved      Boolean        @default(false)
 
-  availability  Availability[]
-  bookings      Booking[]
-  reviews       Review[]
+  doctors       Doctor[]
+}
+
+model Doctor {
+  id           String         @id @default(uuid())
+  centerId     String
+  center       CenterProfile  @relation(fields: [centerId], references: [id])
+
+  name         String
+  specialty    String
+  phone        String
+  fee          Int
+  bio          String?
+  email        String?
+
+  availability Availability[]
+  bookings     Booking[]
+  reviews      Review[]
 }
 
 model Availability {
-  id        String        @id @default(uuid())
-  doctorId  String
-  doctor    DoctorProfile @relation(fields: [doctorId], references: [id])
+  id         String      @id @default(uuid())
+  doctorId   String
+  doctor     Doctor      @relation(fields: [doctorId], references: [id])
 
-  dayOfWeek Int           // 0 = Sunday ... 6 = Saturday
-  startTime String        // "10:00"
-  endTime   String        // "11:00"
+  dayOfWeek  Int         // 0 = Sunday ... 6 = Saturday
+  startTime  String      // "10:00"
+  endTime    String      // "11:00"
+
+  slotBlocks SlotBlock[]
+}
+
+// Presence of a row = that specific date is marked "Full" for this weekly slot
+model SlotBlock {
+  id             String       @id @default(uuid())
+  availabilityId String
+  availability   Availability @relation(fields: [availabilityId], references: [id])
+  date           DateTime
+
+  @@unique([availabilityId, date])
 }
 
 model Booking {
-  id        String        @id @default(uuid())
-  patientId String
-  patient   User          @relation("PatientBookings", fields: [patientId], references: [id])
+  id           String        @id @default(uuid())
+  patientId    String
+  patient      User          @relation("PatientBookings", fields: [patientId], references: [id])
 
-  doctorId  String
-  doctor    DoctorProfile @relation(fields: [doctorId], references: [id])
+  doctorId     String
+  doctor       Doctor        @relation(fields: [doctorId], references: [id])
 
-  date      DateTime
-  timeSlot  String
-  status    BookingStatus @default(PENDING)
-  amount    Int
-  createdAt DateTime      @default(now())
-
-  payment   Payment?
-}
-
-model Payment {
-  id            String   @id @default(uuid())
-  bookingId     String   @unique
-  booking       Booking  @relation(fields: [bookingId], references: [id])
-
-  amount        Int
-  status        String   // "succeeded" | "failed" | "refunded"
-  stripeId      String?
-  createdAt     DateTime @default(now())
+  date         DateTime
+  timeSlot     String
+  patientName  String
+  patientPhone String
+  status       BookingStatus @default(BOOKED)
+  paid         Boolean       @default(false)
+  createdAt    DateTime      @default(now())
 }
 
 model Review {
-  id         String        @id @default(uuid())
-  patientId  String
-  patient    User          @relation(fields: [patientId], references: [id])
+  id        String   @id @default(uuid())
+  patientId String
+  patient   User     @relation(fields: [patientId], references: [id])
 
-  doctorId   String
-  doctor     DoctorProfile @relation(fields: [doctorId], references: [id])
+  doctorId  String
+  doctor    Doctor   @relation(fields: [doctorId], references: [id])
 
-  rating     Int
-  comment    String?
-  createdAt  DateTime      @default(now())
+  rating    Int
+  comment   String?
+  createdAt DateTime @default(now())
+}
+
+model Notification {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+
+  type      String
+  message   String
+  bookingId String?
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
 }

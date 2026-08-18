@@ -6,11 +6,16 @@ import { prisma } from "../utils/prisma";
 // Handles: POST /api/auth/signup
 export const signup = async (req: Request, res: Response) => {
   try {
-    const { name, email, password, role } = req.body;
+    const { name, email, password, role, phone, city, clinicAddress } = req.body;
 
-    // Basic check: role must be PATIENT or DOCTOR (never ADMIN from signup form)
-    if (role !== "PATIENT" && role !== "DOCTOR") {
+    // Basic check: role must be PATIENT or CENTER (never ADMIN from signup form)
+    if (role !== "PATIENT" && role !== "CENTER") {
       return res.status(400).json({ error: "Invalid role" });
+    }
+
+    // Phone is mandatory for Center, optional for Patient
+    if (role === "CENTER" && (!phone || !city || !clinicAddress)) {
+      return res.status(400).json({ error: "Phone, city, and address are required for Center accounts" });
     }
 
     // Check if email is already used
@@ -23,18 +28,16 @@ export const signup = async (req: Request, res: Response) => {
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const user = await prisma.user.create({
-      data: { name, email, password: hashedPassword, role },
+      data: { name, email, password: hashedPassword, role, phone: phone || null },
     });
 
-    // If they signed up as a doctor, also create an empty DoctorProfile for them
-    if (role === "DOCTOR") {
-      await prisma.doctorProfile.create({
+    // If they signed up as a center, also create an empty CenterProfile for them
+    if (role === "CENTER") {
+      await prisma.centerProfile.create({
         data: {
           userId: user.id,
-          specialty: "",
-          city: "",
-          clinicAddress: "",
-          fee: 0,
+          city,
+          clinicAddress,
         },
       });
     }

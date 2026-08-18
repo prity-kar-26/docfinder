@@ -8,11 +8,12 @@ export const metadata: Metadata = {
 };
 
 // suppressHydrationWarning - stops a harmless warning that happens because the theme is decided in the browser, not on the server
+// {children} is where Next.js automatically drops in whichever page you're currently on, so this layout wraps all pages in the app
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode}>) {
   return (
     <html lang="en" suppressHydrationWarning>    
       <body>
-        <ThemeProvider>{children}</ThemeProvider>
+        <ThemeProvider>{children}</ThemeProvider>   
       </body>
     </html>
   );

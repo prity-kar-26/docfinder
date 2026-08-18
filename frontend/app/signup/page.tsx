@@ -27,7 +27,7 @@ export default function SignupPage() {
 
       <BackButton />
 
-      <div className="relative z-10 w-full max-w-lg px-4">
+      <div className="relative z-10 w-full max-w-2xl px-4">
         <SignupForm />
       </div>
     </div>

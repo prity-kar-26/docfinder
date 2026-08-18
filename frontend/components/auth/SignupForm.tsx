@@ -14,10 +14,13 @@ import {
 
 export default function SignupForm() {
   const router = useRouter();
-  const [role, setRole] = useState<"PATIENT" | "DOCTOR" | null>(null);
+  const [role, setRole] = useState<"PATIENT" | "CENTER">("PATIENT");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [phone, setPhone] = useState("");
+  const [city, setCity] = useState("");
+  const [clinicAddress, setClinicAddress] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -25,8 +28,8 @@ export default function SignupForm() {
     e.preventDefault();
     setError("");
 
-    if (!role) {
-      setError("Please choose whether you're signing up as a Patient or a Doctor/Center.");
+    if (role === "CENTER" && (!phone.trim() || !city.trim() || !clinicAddress.trim())) {
+      setError("Phone number, city, and address are required for Doctor/Center accounts.");
       return;
     }
 
@@ -35,7 +38,15 @@ export default function SignupForm() {
       const res = await fetch("http://localhost:5000/api/auth/signup", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, password, role }),
+        body: JSON.stringify({
+          name,
+          email,
+          password,
+          role,
+          phone: phone || undefined,
+          city: role === "CENTER" ? city : undefined,
+          clinicAddress: role === "CENTER" ? clinicAddress : undefined,
+        }),
       });
 
       const data = await res.json();
@@ -50,9 +61,9 @@ export default function SignupForm() {
       localStorage.setItem("user", JSON.stringify(data.user));
 
       if (data.user.role === "PATIENT") {
-        router.push("/patient/search");
+        router.push("/patient/dashboard");
       } else {
-        router.push("/doctor/dashboard");
+        router.push("/center/dashboard");
       }
     } catch (err) {
       setError("Could not connect to server. Is the backend running?");
@@ -61,7 +72,7 @@ export default function SignupForm() {
   };
 
   return (
-    <Card className="w-full max-w-lg">
+    <Card className="w-full max-w-4xl">
       <CardHeader>
         <CardTitle>Create your account</CardTitle>
       </CardHeader>
@@ -80,19 +91,21 @@ export default function SignupForm() {
             </Button>
             <Button
               type="button"
-              variant={role === "DOCTOR" ? "default" : "outline"}
+              variant={role === "CENTER" ? "default" : "outline"}
               className="flex-1"
-              onClick={() => setRole("DOCTOR")}
+              onClick={() => setRole("CENTER")}
             >
-              Doctor / Center
+              Clinic / Center
             </Button>
           </div>
         </div>
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4 gap-4">
           <div>
-            <Label htmlFor="name">Full name</Label>
+            <Label htmlFor="name" className="pb-1">
+              {role === "CENTER" ? "Clinic / Center Name" : "Full Name"} <span className="text-red-500">*</span>
+            </Label>
             <Input
               id="name"
               type="text"
@@ -102,7 +115,9 @@ export default function SignupForm() {
             />
           </div>
           <div>
-            <Label htmlFor="email">Email</Label>
+            <Label htmlFor="email" className="pb-1">
+              Email <span className="text-red-500">*</span>
+            </Label>
             <Input
               id="email"
               type="email"
@@ -112,7 +127,51 @@ export default function SignupForm() {
             />
           </div>
           <div>
-            <Label htmlFor="password">Password</Label>
+            <Label htmlFor="phone" className="pb-1">
+              Phone Number {role === "CENTER" && <span className="text-red-500">*</span>}
+            </Label>
+            <Input
+              id="phone"
+              type="tel"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              required={role === "CENTER"}
+            />
+          </div>
+
+          {role === "CENTER" && (
+            <>
+              <div>
+                <Label htmlFor="city" className="pb-1">
+                  City <span className="text-red-500">*</span>
+                </Label>
+                <Input
+                  id="city"
+                  type="text"
+                  value={city}
+                  onChange={(e) => setCity(e.target.value)}
+                  required
+                />
+              </div>
+              <div>
+                <Label htmlFor="clinicAddress" className="pb-1">
+                  Clinic / Center Address <span className="text-red-500">*</span>
+                </Label>
+                <Input
+                  id="clinicAddress"
+                  type="text"
+                  value={clinicAddress}
+                  onChange={(e) => setClinicAddress(e.target.value)}
+                  required
+                />
+              </div>
+            </>
+          )}
+
+          <div>
+            <Label htmlFor="password" className="pb-1">
+              Password <span className="text-red-500">*</span>
+            </Label>
             <Input
               id="password"
               type="password"

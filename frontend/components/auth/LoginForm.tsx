@@ -43,9 +43,9 @@ export default function LoginForm() {
       localStorage.setItem("user", JSON.stringify(data.user));
 
       if (data.user.role === "PATIENT") {
-        router.push("/patient/search");
-      } else if (data.user.role === "DOCTOR") {
-        router.push("/doctor/dashboard");
+        router.push("/patient/dashboard");
+      } else if (data.user.role === "CENTER") {
+        router.push("/center/dashboard");
       } else {
         router.push("/admin/dashboard");
       }
@@ -63,7 +63,7 @@ export default function LoginForm() {
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <Label htmlFor="email">Email</Label>
+            <Label htmlFor="email" className="pb-1">Email<span className="text-red-500">*</span></Label>
             <Input
               id="email"
               type="email"
@@ -73,7 +73,7 @@ export default function LoginForm() {
             />
           </div>
           <div>
-            <Label htmlFor="password">Password</Label>
+            <Label htmlFor="password" className="pb-1">Password<span className="text-red-500">*</span></Label>
             <Input
               id="password"
               type="password"

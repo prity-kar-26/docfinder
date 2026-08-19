@@ -74,33 +74,33 @@ export function EditDoctorModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
+      <DialogContent className="sm:max-w-2xl">
         <DialogHeader>
           <DialogTitle>Edit Doctor</DialogTitle>
         </DialogHeader>
         <div className="space-y-3">
           <div>
-            <Label htmlFor="edit-doc-name">Doctor's Name</Label>
+            <Label htmlFor="edit-doc-name" className="pb-1">Doctor's Name<span className="text-red-500">*</span></Label>
             <Input id="edit-doc-name" value={name} onChange={(e) => setName(e.target.value)} />
           </div>
           <div>
-            <Label htmlFor="edit-doc-specialty">Specialty</Label>
+            <Label htmlFor="edit-doc-specialty" className="pb-1">Specialty<span className="text-red-500">*</span></Label>
             <Input id="edit-doc-specialty" value={specialty} onChange={(e) => setSpecialty(e.target.value)} />
           </div>
           <div>
-            <Label htmlFor="edit-doc-phone">Phone Number</Label>
+            <Label htmlFor="edit-doc-phone" className="pb-1">Phone Number<span className="text-red-500">*</span></Label>
             <Input id="edit-doc-phone" value={phone} onChange={(e) => setPhone(e.target.value)} />
           </div>
           <div>
-            <Label htmlFor="edit-doc-fee">Consultation Fee</Label>
+            <Label htmlFor="edit-doc-fee" className="pb-1">Consultation Fee<span className="text-red-500">*</span></Label>
             <Input id="edit-doc-fee" type="number" value={fee} onChange={(e) => setFee(e.target.value)} />
           </div>
           <div>
-            <Label htmlFor="edit-doc-email">Email (optional)</Label>
+            <Label htmlFor="edit-doc-email" className="pb-1">Email</Label>
             <Input id="edit-doc-email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
           </div>
           <div>
-            <Label htmlFor="edit-doc-bio">Bio (optional)</Label>
+            <Label htmlFor="edit-doc-bio" className="pb-1">Bio</Label>
             <Textarea id="edit-doc-bio" value={bio} onChange={(e) => setBio(e.target.value)} />
           </div>
           {error && <p className="text-red-500 text-sm">{error}</p>}

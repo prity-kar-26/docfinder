@@ -2,11 +2,14 @@
 
 import { useEffect, useState } from "react"
 import { apiFetch } from "@/lib/api"
+import { dayColors, dayNames, formatDate } from "@/lib/utils"
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet"
 import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover"
 import { Calendar } from "@/components/ui/calendar"
 import { Button } from "@/components/ui/button"
+import { Card } from "@/components/ui/card"
 import { Clock } from "lucide-react"
+import { NoDataAvailable } from "../shared/NoDataAvailable"
 
 type SlotBlock = { id: string; date: string }
 type Slot = {
@@ -16,8 +19,6 @@ type Slot = {
   endTime: string
   slotBlocks: SlotBlock[]
 }
-
-const dayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
 
 function sameDate(a: Date, b: Date) {
   return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate()
@@ -67,17 +68,25 @@ function SlotRow({ slot, onSlotUpdate }: { slot: Slot; onSlotUpdate: (slot: Slot
   today.setHours(0, 0, 0, 0)
 
   return (
-    <div className="flex items-center justify-between border rounded-md p-3">
-      <div>
-        <p className="text-sm font-medium">{dayNames[slot.dayOfWeek]}</p>
-        <p className="text-sm text-muted-foreground">{slot.startTime} - {slot.endTime}</p>
+    <Card className="p-3 flex flex-row items-center justify-between gap-3">
+      <div className="flex items-center gap-2">
+        <span className={`text-xs font-medium px-2.5 py-1 rounded-full ${dayColors[slot.dayOfWeek]}`}>
+          {dayNames[slot.dayOfWeek]}
+        </span>
+        <span className="inline-flex items-center gap-1 text-sm font-semibold text-purple-600 dark:text-purple-400 bg-muted px-2.5 py-1 rounded-md">
+          <Clock className="h-3.5 w-3.5 text-purple-600 dark:text-purple-400" />
+          {slot.startTime} – {slot.endTime}
+        </span>
       </div>
 
       <Popover onOpenChange={() => setFeedback("")}>
-        <PopoverTrigger className="p-2 rounded-md hover:bg-muted" aria-label="Manage dates">
-          <Clock className="h-4 w-4" />
+        <PopoverTrigger
+          className="h-7 w-7 flex items-center justify-center rounded-md border border-yellow-500 text-yellow-600 hover:bg-yellow-50 dark:hover:bg-yellow-950 dark:border-yellow-600 dark:text-yellow-500 transition-colors flex-shrink-0"
+          aria-label="Manage dates"
+        >
+          <Clock className="h-3.5 w-3.5" />
         </PopoverTrigger>
-        <PopoverContent className="w-auto p-3">
+        <PopoverContent className="w-auto p-3 space-y-2">
           <Calendar
             mode="single"
             selected={selectedDate}
@@ -87,7 +96,7 @@ function SlotRow({ slot, onSlotUpdate }: { slot: Slot; onSlotUpdate: (slot: Slot
           {selectedDate && (
             <>
               <Button
-                className="w-full mt-2"
+                className="w-full"
                 variant={isFullOnSelected ? "outline" : "destructive"}
                 disabled={toggling}
                 onClick={handleToggle}
@@ -95,17 +104,17 @@ function SlotRow({ slot, onSlotUpdate }: { slot: Slot; onSlotUpdate: (slot: Slot
                 {toggling ? "Updating..." : isFullOnSelected ? "Mark as Free" : "Mark as Full"}
               </Button>
               {feedback && (
-                <p className="text-xs text-center mt-1 text-muted-foreground">{feedback}</p>
+                <p className="text-xs text-center text-muted-foreground">{feedback}</p>
               )}
             </>
           )}
         </PopoverContent>
       </Popover>
-    </div>
+    </Card>
   )
 }
 
-export function DoctorAvailabilityDrawer({ doctorId, doctorName, open, onOpenChange }: {
+export function DoctorAvailabilityDrawer({ doctorId, doctorName, open, onOpenChange } : {
   doctorId: string | null
   doctorName: string
   open: boolean
@@ -129,14 +138,14 @@ export function DoctorAvailabilityDrawer({ doctorId, doctorName, open, onOpenCha
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent side="right" className="w-96">
-        <SheetHeader>
-          <SheetTitle>{doctorName}'s Availability</SheetTitle>
+      <SheetContent side="right" className="w-[480px] data-[side=right]:w-[480px] data-[side=right]:sm:max-w-[480px] p-5" >
+        <SheetHeader className="p-0 pb-4 border-b">
+          <SheetTitle className="text-lg"><strong>{doctorName}</strong>'s Availability</SheetTitle>
         </SheetHeader>
-        <div className="mt-4 space-y-3">
+        <div className="space-y-2.5">
           {loading && <p className="text-sm text-muted-foreground">Loading...</p>}
           {!loading && slots.length === 0 && (
-            <p className="text-sm text-muted-foreground">No availability set yet.</p>
+            <NoDataAvailable message="No availability set yet." />
           )}
           {slots.map((slot) => (
             <SlotRow key={slot.id} slot={slot} onSlotUpdate={updateSlot} />

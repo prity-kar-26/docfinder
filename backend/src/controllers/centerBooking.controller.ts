@@ -12,12 +12,13 @@ export const getCenterBookings = async (req: AuthRequest, res: Response) => {
     const centerId = await getCenterId(req.user!.userId);
     if (!centerId) return res.status(404).json({ error: "Center profile not found" });
 
-    const { search, date } = req.query;
+    const { search, date, doctorId } = req.query;
 
     const bookings = await prisma.booking.findMany({
       where: {
         doctor: { centerId },
         ...(date && { date: new Date(date as string) }),
+        ...(doctorId && { doctorId: doctorId as string }),
         ...(search && {
           OR: [
             { patientName: { contains: search as string, mode: "insensitive" } },
@@ -25,8 +26,8 @@ export const getCenterBookings = async (req: AuthRequest, res: Response) => {
           ],
         }),
       },
-      include: { doctor: { select: { name: true, specialty: true } } },
-      orderBy: { date: "asc" },
+      include: { doctor: { select: { id: true,name: true, specialty: true } } },
+      orderBy: [{ date: "asc" }, { timeSlot: "asc" }],
     });
 
     res.json(bookings);

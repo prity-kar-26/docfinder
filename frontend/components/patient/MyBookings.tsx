@@ -11,6 +11,7 @@ import {
   AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction,
 } from "@/components/ui/alert-dialog"
 import { CalendarCheck, CalendarDays, Clock } from "lucide-react"
+import { buttonVariants } from "../ui/button"
 
 type Booking = {
   id: string
@@ -18,6 +19,7 @@ type Booking = {
   timeSlot: string
   status: "BOOKED" | "CANCELLED"
   paid: boolean
+  patientName: string
   doctor: {
     name: string
     specialty: string
@@ -93,8 +95,12 @@ export function MyBookings() {
             </div>
 
             <div className="flex flex-col items-end gap-2">
+              <p className="text-sm">
+                <span className="text-muted-foreground">Booked For: </span>
+                <span className="font-semibold text-indigo-600 dark:text-indigo-400">{b.patientName}</span>
+              </p>
               <div className="flex gap-2">
-                <Badge variant={b.status === "CANCELLED" ? "outline" : "default"}>
+                <Badge className={b.status === "CANCELLED" ? "bg-red-500 hover:bg-red-500" : "bg-teal-600 hover:bg-teal-600"}>
                   {b.status === "CANCELLED" ? "Cancelled" : "Booked"}
                 </Badge>
                 <Badge className={b.paid ? "bg-green-600 hover:bg-green-600" : "bg-amber-500 hover:bg-amber-500"}>
@@ -105,11 +111,17 @@ export function MyBookings() {
               {canCancel && (
                 <AlertDialog>
                   <AlertDialogTrigger
-                    className="text-xs text-red-500 border border-red-500/60 bg-transparent hover:bg-red-500/10 px-2 py-1 rounded-full transition-colors disabled:opacity-50"
+                    className="text-xs text-red-500 border border-red-500/60 bg-transparent hover:bg-red-500/10 px-2 py-1 rounded-md transition-colors disabled:opacity-50"
                     disabled={actionLoading === b.id}
                   >
                     Cancel Booking
                   </AlertDialogTrigger>
+                  {/* <AlertDialogTrigger
+                    className={buttonVariants({ variant: "destructive", size: "sm" })}
+                    disabled={actionLoading === b.id}
+                  >
+                    Cancel Booking
+                  </AlertDialogTrigger> */}
                   <AlertDialogContent className="sm:max-w-lg">
                     <AlertDialogHeader>
                       <AlertDialogTitle>Cancel this booking?</AlertDialogTitle>

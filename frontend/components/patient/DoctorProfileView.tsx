@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { apiFetch } from "@/lib/api"
-import { formatDate } from "@/lib/utils"
+import { dayColors, dayNames, formatDate } from "@/lib/utils"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -22,17 +22,6 @@ type DoctorDetail = {
   center: { city: string | null; clinicAddress: string | null; user: { name: string } }
   availability: Availability[]
 }
-
-const dayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
-const dayColors = [
-  "bg-red-100 text-red-700 dark:bg-red-950 dark:text-red-300",
-  "bg-orange-100 text-orange-700 dark:bg-orange-950 dark:text-orange-300",
-  "bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-300",
-  "bg-green-100 text-green-700 dark:bg-green-950 dark:text-green-300",
-  "bg-teal-100 text-teal-700 dark:bg-teal-950 dark:text-teal-300",
-  "bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-300",
-  "bg-purple-100 text-purple-700 dark:bg-purple-950 dark:text-purple-300",
-]
 
 function sameDate(a: Date, b: Date) {
   return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate()
@@ -133,7 +122,7 @@ export function DoctorProfileView({ doctorId }: { doctorId: string }) {
           </div>
           <div className="flex items-center justify-between">
             <p className="text-sm text-muted-foreground">{doctor.specialty}</p>
-            <p className="text-sm text-muted-foreground">{doctor.center.user.name}</p>
+            <p className="text-sm text-muted-foreground">{doctor.center.user.name}, {doctor.center.city}</p>
           </div>
         </div>
       </Card>
@@ -146,9 +135,6 @@ export function DoctorProfileView({ doctorId }: { doctorId: string }) {
         </h2>
 
         {doctor.availability.length === 0 && (
-          // <Card className="p-6 text-center text-sm text-muted-foreground">
-          //   No availability set yet.
-          // </Card>
           <NoDataAvailable message="No availability set yet." />
         )}
 

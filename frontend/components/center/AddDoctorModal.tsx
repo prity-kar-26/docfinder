@@ -71,37 +71,37 @@ export function AddDoctorModal({ onAdded }: { onAdded: (doctor: Doctor) => void 
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger className="flex flex-col items-center justify-center h-40 w-full rounded-lg border-2 border-dashed hover:bg-muted transition-colors">
-        <Plus className="h-6 w-6 mb-1" />
-        <span className="text-sm">Add Doctor</span>
+      <DialogTrigger className="flex flex-col items-center justify-center h-30 w-full rounded-lg border-2 border-dashed hover:bg-muted transition-colors">
+        <Plus className="h-6 w-6 mb-1 text-blue-600" />
+        <span className="text-sm text-blue-600">Add Doctor</span>
       </DialogTrigger>
-      <DialogContent>
+      <DialogContent className="sm:max-w-2xl">
         <DialogHeader>
           <DialogTitle>Add a Doctor</DialogTitle>
         </DialogHeader>
         <div className="space-y-3">
           <div>
-            <Label htmlFor="doc-name">Doctor's Name</Label>
+            <Label htmlFor="doc-name" className="pb-1">Doctor's Name<span className="text-red-500">*</span></Label>
             <Input id="doc-name" value={name} onChange={(e) => setName(e.target.value)} />
           </div>
           <div>
-            <Label htmlFor="doc-specialty">Specialty</Label>
+            <Label htmlFor="doc-specialty" className="pb-1">Specialty<span className="text-red-500">*</span></Label>
             <Input id="doc-specialty" value={specialty} onChange={(e) => setSpecialty(e.target.value)} />
           </div>
           <div>
-            <Label htmlFor="doc-phone">Phone Number</Label>
+            <Label htmlFor="doc-phone" className="pb-1">Phone Number<span className="text-red-500">*</span></Label>
             <Input id="doc-phone" value={phone} onChange={(e) => setPhone(e.target.value)} />
           </div>
           <div>
-            <Label htmlFor="doc-fee">Consultation Fee</Label>
+            <Label htmlFor="doc-fee" className="pb-1">Consultation Fee<span className="text-red-500">*</span></Label>
             <Input id="doc-fee" type="number" value={fee} onChange={(e) => setFee(e.target.value)} />
           </div>
           <div>
-            <Label htmlFor="doc-email">Email (optional)</Label>
+            <Label htmlFor="doc-email" className="pb-1">Email</Label>
             <Input id="doc-email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
           </div>
           <div>
-            <Label htmlFor="doc-bio">Bio (optional)</Label>
+            <Label htmlFor="doc-bio" className="pb-1">Bio</Label>
             <Textarea id="doc-bio" value={bio} onChange={(e) => setBio(e.target.value)} />
           </div>
 

@@ -16,6 +16,9 @@ export const getMyDoctors = async (req: AuthRequest, res: Response) => {
     const doctors = await prisma.doctor.findMany({
       where: { centerId },
       orderBy: { name: "asc" },
+      include: {
+        availability: { select: { dayOfWeek: true } },
+      },
     });
 
     res.json(doctors);

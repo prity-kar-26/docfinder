@@ -2,21 +2,18 @@
 
 import { useEffect, useState } from "react"
 import { apiFetch } from "@/lib/api"
-import { Button } from "@/components/ui/button"
+import { Button, buttonVariants } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import {
-  Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle,
-} from "@/components/ui/dialog"
+import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import {
   AlertDialog, AlertDialogTrigger, AlertDialogContent, AlertDialogHeader,
   AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction,
 } from "@/components/ui/alert-dialog"
-import { Plus, Pencil, Trash2 } from "lucide-react"
+import { Plus, Pencil, Trash2, Clock } from "lucide-react"
+import { dayColors, dayNames } from "@/lib/utils"
 
 type Slot = { id: string; dayOfWeek: number; startTime: string; endTime: string }
-
-const dayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
 
 export function AvailabilitySlotModal({ doctorId, doctorName }: { doctorId: string; doctorName: string }) {
   const [open, setOpen] = useState(false)
@@ -102,19 +99,22 @@ export function AvailabilitySlotModal({ doctorId, doctorName }: { doctorId: stri
 
   return (
     <Dialog open={open} onOpenChange={(o) => { setOpen(o); if (!o) resetForm() }}>
-      <DialogTrigger className="p-2 rounded-md hover:bg-muted" aria-label={`Manage ${doctorName}'s slots`}>
-        <Plus className="h-4 w-4" />
+      <DialogTrigger
+        className="h-7 w-7 flex items-center justify-center rounded-md border border-blue-500 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-950 dark:border-blue-600 dark:text-blue-500 transition-colors flex-shrink-0"
+        aria-label={`Manage ${doctorName}'s slots`}
+      >
+        <Plus className="h-3.5 w-3.5" />
       </DialogTrigger>
-      <DialogContent className="max-w-2xl">
+      <DialogContent className="w-[950px] sm:max-w-[800px] max-h-[600px] p-6">
         <DialogHeader>
-          <DialogTitle>{doctorName}'s Availability</DialogTitle>
+          <DialogTitle><strong>{doctorName}</strong>'s Availability</DialogTitle>
         </DialogHeader>
 
         <div className="grid grid-cols-2 gap-6 mt-2">
           {/* Left: add/edit form */}
-          <div className="space-y-3">
+          <div className="space-y-3 pr-6 border-r">
             <div>
-              <Label htmlFor="slot-day">Day</Label>
+              <Label htmlFor="slot-day" className="pb-1">Day<span className="text-red-500">*</span></Label>
               <select
                 id="slot-day"
                 value={dayOfWeek}
@@ -127,11 +127,11 @@ export function AvailabilitySlotModal({ doctorId, doctorName }: { doctorId: stri
               </select>
             </div>
             <div>
-              <Label htmlFor="slot-start">Start Time</Label>
+              <Label htmlFor="slot-start" className="pb-1">Start Time<span className="text-red-500">*</span></Label>
               <Input id="slot-start" type="time" value={startTime} onChange={(e) => setStartTime(e.target.value)} />
             </div>
             <div>
-              <Label htmlFor="slot-end">End Time</Label>
+              <Label htmlFor="slot-end" className="pb-1">End Time<span className="text-red-500">*</span></Label>
               <Input id="slot-end" type="time" value={endTime} onChange={(e) => setEndTime(e.target.value)} />
             </div>
             {error && <p className="text-red-500 text-sm">{error}</p>}
@@ -146,20 +146,37 @@ export function AvailabilitySlotModal({ doctorId, doctorName }: { doctorId: stri
           </div>
 
           {/* Right: existing slots */}
-          <div className="space-y-2 max-h-80 overflow-y-auto">
+          <div className="space-y-2 max-h-[420px] overflow-y-auto pr-1">
             {loading && <p className="text-sm text-muted-foreground">Loading...</p>}
             {!loading && slots.length === 0 && (
               <p className="text-sm text-muted-foreground">No slots added yet.</p>
             )}
             {slots.map((slot) => (
-              <div key={slot.id} className="flex items-center justify-between border rounded-md p-2 text-sm">
-                <span>{dayNames[slot.dayOfWeek]} — {slot.startTime} to {slot.endTime}</span>
-                <div className="flex gap-1">
-                  <Button size="icon" variant="ghost" aria-label="Edit slot" onClick={() => handleEditClick(slot)}>
+              <div key={slot.id} className="flex items-center justify-between border rounded-md p-2.5">
+                <div className="flex items-center gap-2">
+                  <span className={`text-xs font-medium px-2.5 py-1 rounded-full ${dayColors[slot.dayOfWeek]}`}>
+                    {dayNames[slot.dayOfWeek]}
+                  </span>
+                  <span className="inline-flex items-center gap-1 text-sm font-semibold text-purple-600 dark:text-purple-400 bg-muted px-2.5 py-1 rounded-md">
+                    <Clock className="h-3.5 w-3.5 text-purple-600 dark:text-purple-400" />
+                    {slot.startTime} – {slot.endTime}
+                  </span>
+                </div>
+                <div className="flex gap-1.5 flex-shrink-0">
+                  <Button
+                    size="icon"
+                    variant="outline"
+                    className="h-7 w-7 rounded-md border-green-400 text-green-600 hover:bg-green-50 dark:hover:bg-green-950"
+                    aria-label="Edit slot"
+                    onClick={() => handleEditClick(slot)}
+                  >
                     <Pencil className="h-3.5 w-3.5" />
                   </Button>
                   <AlertDialog>
-                    <AlertDialogTrigger className="p-2 rounded-md hover:bg-muted text-red-500" aria-label="Delete slot">
+                    <AlertDialogTrigger
+                      className="h-7 w-7 flex items-center justify-center rounded-md border border-red-400 text-red-600 hover:bg-red-50 dark:hover:bg-red-950"
+                      aria-label="Delete slot"
+                    >
                       <Trash2 className="h-3.5 w-3.5" />
                     </AlertDialogTrigger>
                     <AlertDialogContent>

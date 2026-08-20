@@ -1,6 +1,6 @@
 // DocFinder database schema
 // Run `npx prisma migrate dev --name init` after setting DATABASE_URL in .env
-// npx prisma migrate dev --name center_doctor_pivot
+// npx prisma migrate dev --name center_doctor_pivot  - change/add fields in the table
 // npx prisma generate
 // restart the TS server: Ctrl+Shift+P → "TypeScript: Restart TS Server" → Enter.
 // npx prisma studio
@@ -104,6 +104,7 @@ model Booking {
   timeSlot     String
   patientName  String
   patientPhone String
+  amount       Int
   status       BookingStatus @default(BOOKED)
   paid         Boolean       @default(false)
   createdAt    DateTime      @default(now())

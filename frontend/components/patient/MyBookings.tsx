@@ -20,6 +20,7 @@ type Booking = {
   status: "BOOKED" | "CANCELLED"
   paid: boolean
   patientName: string
+  amount: number
   doctor: {
     name: string
     specialty: string
@@ -82,14 +83,24 @@ export function MyBookings() {
                 <p className="font-semibold leading-tight">{b.doctor.name}</p>
                 <p className="text-sm text-muted-foreground">{b.doctor.specialty} · {b.doctor.center.user.name}</p>
                 <div className="flex items-center gap-3 mt-1 text-xs">
-                  <span className="flex items-center gap-1 text-blue-600 dark:text-blue-400 font-medium">
+                  {/* <span className="flex items-center gap-1 text-blue-600 dark:text-blue-400 font-medium">
                     <CalendarDays className="h-3.5 w-3.5" />
                     {formatDate(b.date)}
                   </span>
                   <span className="flex items-center gap-1 text-purple-500 dark:text-purple-500">
                     <Clock className="h-3.5 w-3.5" />
                     {b.timeSlot}
-                  </span>
+                  </span> */}
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-medium px-2.5 py-1 rounded-full bg-green-100 text-green-700 dark:bg-green-950 dark:text-green-300">
+                      {formatDate(b.date)}
+                    </span>
+                    <span className="inline-flex items-center gap-1 text-xs font-semibold text-purple-600 dark:text-purple-400 bg-muted px-2.5 py-1 rounded-md">
+                      <Clock className="h-3 w-3" />
+                      {b.timeSlot}
+                    </span>
+                  </div>
+                  <Badge className="bg-blue-600 hover:bg-blue-600 text-xs px-(--card-spacing)">₹{b.amount}</Badge>
                 </div>
               </div>
             </div>

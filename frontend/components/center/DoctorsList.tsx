@@ -110,8 +110,6 @@ export function DoctorsList() {
                     </p>
                 )}
 
-                {/* <AddDoctorModal onAdded={(doctor) => setDoctors((prev) => [...prev, doctor])} /> */}
-
                 <EditDoctorModal
                     doctor={editingDoctor}
                     open={!!editingDoctor}

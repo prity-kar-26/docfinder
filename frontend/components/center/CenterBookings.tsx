@@ -19,6 +19,7 @@ type Booking = {
   patientPhone: string
   status: "BOOKED" | "CANCELLED"
   paid: boolean
+  amount: number
   doctor: { id: string; name: string; specialty: string }
 }
 
@@ -161,6 +162,7 @@ export function CenterBookings() {
                           <Clock className="h-3 w-3" />
                           {b.timeSlot}
                         </span>
+                        <Badge className="bg-blue-600 hover:bg-blue-600 text-xs px-(--card-spacing)">₹{b.amount}</Badge>
                       </div>
                     </div>
                   </div>

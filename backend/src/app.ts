@@ -21,6 +21,9 @@ app.use("/api/auth", authRoutes);
 import centerRoutes from "./routes/center.routes";
 app.use("/api/center", centerRoutes);
 
+import overviewRoutes from "./routes/overview.routes";
+app.use("/api/center/overview", overviewRoutes);
+
 import availabilityRoutes from "./routes/availability.routes";
 app.use("/api/center", availabilityRoutes);
 
@@ -29,6 +32,9 @@ app.use("/api/center/bookings", centerBookingRoutes);
 
 import publicDoctorRoutes from "./routes/publicDoctor.routes";
 app.use("/api/doctors", publicDoctorRoutes);
+
+import earningsRoutes from "./routes/earnings.routes";
+app.use("/api/center/earnings", earningsRoutes);
 
 import bookingRoutes from "./routes/booking.routes";
 app.use("/api/bookings", bookingRoutes);

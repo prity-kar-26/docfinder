@@ -39,9 +39,13 @@ export const createBooking = async (req: AuthRequest, res: Response) => {
       where: { id: doctorId },
       include: { center: { select: { userId: true, id: true } } },
     });
+    
+    if (!doctor) {
+      return res.status(404).json({ error: "Doctor not found" });
+    }
 
     const booking = await prisma.booking.create({
-      data: { patientId, doctorId, date: pickedDate, timeSlot, patientName, patientPhone },
+      data: { patientId, doctorId, date: pickedDate, timeSlot, patientName, patientPhone, amount: doctor.fee },
     });
 
     if (doctor) {

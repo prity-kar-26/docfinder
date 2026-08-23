@@ -17,7 +17,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         <ThemeProvider>{children}</ThemeProvider>   
         {/* <ThemeProvider>
           <DesktopOnlyGuard>{children}</DesktopOnlyGuard>
-        </ThemeProvider> */}
+        </ThemeProvider>  - alrets to use this site on desktop if the user is on a mobile device, but this is not needed for now since the app is responsive and works on mobile */}
       </body>
     </html>
   );

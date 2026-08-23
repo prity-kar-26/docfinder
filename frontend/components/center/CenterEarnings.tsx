@@ -122,7 +122,7 @@ export function CenterEarnings() {
 
             {!loading && data && (
                 <>
-                    <div className="flex-shrink-0 grid grid-cols-3 gap-3 pb-6">
+                    <div className="flex-shrink-0 grid grid-cols-3 gap-3 pb-6 pr-0.5 pl-0.5">
                         <Card className="p-4 flex flex-row items-center gap-3">
                             <div className="h-11 w-11 rounded-full bg-green-100 dark:bg-green-950 flex items-center justify-center flex-shrink-0">
                                 <IndianRupee className="h-5 w-5 text-green-600 dark:text-green-400" />

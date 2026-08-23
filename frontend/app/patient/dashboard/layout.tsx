@@ -9,7 +9,8 @@ export default function PatientDashboardLayout({
   return (
     <div className="h-screen flex flex-col">
       <Navbar />
-      <div className="flex flex-1 overflow-hidden">
+      {/* <div className="flex flex-1 overflow-hidden"> */}
+      <div className="flex flex-1 overflow-hidden flex-col lg:flex-row">
         <PatientSidebar />
         <main className="flex-1 overflow-y-auto p-4">{children}</main>
       </div>

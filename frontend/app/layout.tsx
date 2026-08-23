@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
+import { DesktopOnlyGuard } from "@/components/shared/DesktopOnlyGuard";
 
 export const metadata: Metadata = {
   title: "DocFinder",
@@ -9,13 +10,17 @@ export const metadata: Metadata = {
 
 // suppressHydrationWarning - stops a harmless warning that happens because the theme is decided in the browser, not on the server
 // {children} is where Next.js automatically drops in whichever page you're currently on, so this layout wraps all pages in the app
-export default function RootLayout({ children }: Readonly<{ children: React.ReactNode}>) {
+export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" suppressHydrationWarning>    
+    <html lang="en" suppressHydrationWarning>
       <body>
         <ThemeProvider>{children}</ThemeProvider>   
+        {/* <ThemeProvider>
+          <DesktopOnlyGuard>{children}</DesktopOnlyGuard>
+        </ThemeProvider> */}
       </body>
     </html>
   );
 }
+
 

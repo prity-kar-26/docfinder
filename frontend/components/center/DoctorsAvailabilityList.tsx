@@ -80,7 +80,7 @@ import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { NoDataAvailable } from "@/components/shared/NoDataAvailable"
 import { AvailabilitySlotModal } from "./AvailabilitySlotModal"
-import { CalendarClock, Search } from "lucide-react"
+import { CalendarClock, Search, Stethoscope } from "lucide-react"
 
 type Doctor = {
   id: string
@@ -143,7 +143,7 @@ export function DoctorsAvailabilityList() {
                 >
                   <div className="flex items-center gap-2.5 min-w-0">
                     <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
-                      <CalendarClock className="h-5 w-5 text-primary" />
+                      <Stethoscope className="h-5 w-5 text-primary" />
                     </div>
                     <div className="min-w-0">
                       <p className="font-semibold leading-tight truncate text-sm">{doctor.name}</p>

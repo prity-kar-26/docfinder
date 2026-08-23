@@ -25,7 +25,10 @@ export default function LoginForm() {
     setLoading(true);
 
     try {
-      const res = await fetch("http://localhost:5000/api/auth/login", {
+      // since they run before login (no token exists yet), 
+      // that's the reason they were written as raw fetch() calls originally rather than using the token-attaching apiFetch helper
+      // const res = await fetch("http://localhost:5000/api/auth/login", {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),

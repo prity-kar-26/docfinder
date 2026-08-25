@@ -1,6 +1,6 @@
 // DocFinder database schema
 // Run `npx prisma migrate dev --name init` after setting DATABASE_URL in .env
-// npx prisma migrate dev --name center_doctor_pivot  - change/add fields in the table
+// npx prisma migrate dev --name center_doctor_pivot  - change/add fields in the table, this dev only command
 // npx prisma generate
 // restart the TS server: Ctrl+Shift+P → "TypeScript: Restart TS Server" → Enter.
 // npx prisma studio

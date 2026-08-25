@@ -6,7 +6,23 @@ dotenv.config();
 
 const app = express();
 
-app.use(cors());
+const allowedOrigins = [
+  "http://localhost:3000",
+  "https://docfinder-ten.vercel.app",
+  "https://docfinder-o4hn9m796-prity3.vercel.app/"
+];
+
+app.use(cors({
+  origin: (origin, callback) => {
+    // Allow requests with no origin (like Postman, curl, or server-to-server calls)
+    if (!origin || allowedOrigins.includes(origin)) {   //this specifically allows tools like Postman (which don't send an Origin header) to keep working for your own testing, without opening the door to arbitrary websites.
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
+}));
+// app.use(cors()); - fine for localhost, This allows any website on the internet to call your API
 app.use(express.json());
 
 // Health check — hit this first to confirm the server is running

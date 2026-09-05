@@ -3,13 +3,19 @@
 import { useEffect, useState } from "react"
 import { apiFetch } from "@/lib/api"
 import { formatDate } from "@/lib/utils"
+import { toast } from "sonner"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { DoctorSelect } from "@/components/shared/DoctorSelect"
 import { NoDataAvailable } from "@/components/shared/NoDataAvailable"
+import {
+  AlertDialog, AlertDialogTrigger, AlertDialogContent, AlertDialogHeader,
+  AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction,
+} from "@/components/ui/alert-dialog"
 import { UserRound, Clock, Phone } from "lucide-react"
+import { CreateBookingModal } from "./CreateBookingModal"
 
 type Booking = {
   id: string
@@ -20,6 +26,7 @@ type Booking = {
   status: "BOOKED" | "CANCELLED"
   paid: boolean
   amount: number
+  source: "ONLINE" | "OFFLINE"
   doctor: { id: string; name: string; specialty: string }
 }
 
@@ -72,13 +79,13 @@ export function CenterBookings() {
   }
 
   const handleCancel = async (id: string) => {
-    if (!confirm("Cancel this booking?")) return
     setActionLoading(id)
     try {
       await apiFetch(`/center/bookings/${id}/cancel`, { method: "PUT" })
+      toast.success("Booking cancelled")
       load()
     } catch (err: any) {
-      alert(err.message || "Failed to cancel")
+      toast.error(err.message || "Failed to cancel")
     } finally {
       setActionLoading(null)
     }
@@ -88,12 +95,18 @@ export function CenterBookings() {
     setActionLoading(id)
     try {
       await apiFetch(`/center/bookings/${id}/paid`, { method: "PUT" })
+      toast.success("Marked as paid")
       load()
     } catch (err: any) {
-      alert(err.message || "Failed to update payment status")
+      toast.error(err.message || "Failed to update payment status")
     } finally {
       setActionLoading(null)
     }
+  }
+
+  const handleCreated = () => {
+    toast.success("Booking created successfully")
+    load()
   }
 
   const hasActiveFilter = search || doctorId
@@ -101,6 +114,11 @@ export function CenterBookings() {
   return (
     <div className="flex flex-col h-full">
       <div className="flex-shrink-0 space-y-3 pb-4">
+        <div className="flex items-center justify-between mb-4">
+          <h1 className="text-2xl font-semibold">Bookings</h1>
+          <CreateBookingModal onCreated={handleCreated} />
+        </div>
+
         <div className="flex flex-wrap items-center gap-3">
           <Input
             placeholder="Search by doctor or patient name"
@@ -147,8 +165,8 @@ export function CenterBookings() {
                     </div>
                     <div className="min-w-0">
                       <p className="font-semibold leading-tight truncate">{b.patientName}</p>
-                      <div className="flex items-center gap-1 text-xs text-purple-600 dark:text-purple mt-0.5">
-                        <Phone className="h-3 w-3 text-purple-600 dark:text-purple" />
+                      <div className="flex items-center gap-1 text-xs text-purple-600 dark:text-purple-400 mt-0.5">
+                        <Phone className="h-3 w-3" />
                         {b.patientPhone}
                       </div>
                       <p className="text-sm font-medium text-muted-foreground mt-0.5 truncate">
@@ -162,7 +180,7 @@ export function CenterBookings() {
                           <Clock className="h-3 w-3" />
                           {b.timeSlot}
                         </span>
-                        <Badge className="bg-blue-600 hover:bg-blue-600 text-xs px-(--card-spacing)">₹{b.amount}</Badge>
+                        <Badge className="bg-blue-600 hover:bg-blue-600 text-xs">₹{b.amount}</Badge>
                       </div>
                     </div>
                   </div>
@@ -175,18 +193,35 @@ export function CenterBookings() {
                       <Badge className={b.paid ? "bg-green-600 hover:bg-green-600" : "bg-amber-500 hover:bg-amber-500"}>
                         {b.paid ? "Paid" : "Unpaid"}
                       </Badge>
+                      {b.source === "OFFLINE" && (
+                        <Badge className="text-xs bg-stone-600 hover:bg-stone-600">Walk-in</Badge>
+                      )}
                     </div>
                     <div className="flex gap-1.5">
                       {canCancel && (
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          className="border-red-400 text-red-600 hover:bg-red-50 dark:hover:bg-red-950"
-                          disabled={actionLoading === b.id}
-                          onClick={() => handleCancel(b.id)}
-                        >
-                          Cancel Booking
-                        </Button>
+                        <AlertDialog>
+                          <AlertDialogTrigger
+                            className="text-xs border border-red-400 text-red-600 hover:bg-red-50 dark:hover:bg-red-950 px-1.5 py-1 rounded-md transition-colors disabled:opacity-50"
+                            disabled={actionLoading === b.id}
+                          >
+                            Cancel Booking
+                          </AlertDialogTrigger>
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>Cancel this booking?</AlertDialogTitle>
+                              <AlertDialogDescription>
+                                The booking for <span className="font-semibold text-foreground">{b.patientName}</span> with{" "}
+                                <span className="font-semibold text-foreground">{b.doctor.name}</span> on {formatDate(b.date)} at {b.timeSlot} will be cancelled. This cannot be undone.
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel>Keep Booking</AlertDialogCancel>
+                              <AlertDialogAction onClick={() => handleCancel(b.id)}>
+                                Yes, Cancel
+                              </AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
                       )}
                       {!b.paid && b.status !== "CANCELLED" && (
                         <Button

@@ -60,6 +60,7 @@ export function DoctorProfileView({ doctorId }: { doctorId: string }) {
       .catch((err) => console.error(err))
       .finally(() => setLoading(false))
   }, [doctorId])
+  console.log("Doctor data:", doctor)
 
   if (loading) return <p>Loading...</p>
   if (!doctor) return <p>Doctor not found.</p>

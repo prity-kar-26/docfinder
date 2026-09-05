@@ -11,7 +11,7 @@ import {
   AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction,
 } from "@/components/ui/alert-dialog"
 import { Plus, Pencil, Trash2, Clock } from "lucide-react"
-import { dayColors, dayNames } from "@/lib/utils"
+import { dayColors, dayNames, formatDate } from "@/lib/utils"
 
 type Slot = { id: string; dayOfWeek: number; startTime: string; endTime: string }
 
@@ -26,6 +26,8 @@ export function AvailabilitySlotModal({ doctorId, doctorName }: { doctorId: stri
   const [editingId, setEditingId] = useState<string | null>(null)
   const [error, setError] = useState("")
   const [saving, setSaving] = useState(false)
+
+  const [conflictBookings, setConflictBookings] = useState<{ id: string; date: string; patientName: string }[] | null>(null)
 
   const load = () => {
     setLoading(true)
@@ -74,7 +76,11 @@ export function AvailabilitySlotModal({ doctorId, doctorName }: { doctorId: stri
       resetForm()
       load()
     } catch (err: any) {
-      setError(err.message || "Failed to save slot")
+      if (err.data?.bookings) {
+        setConflictBookings(err.data.bookings)
+      } else {
+        setError(err.message || "Failed to save slot")
+      }
     } finally {
       setSaving(false)
     }
@@ -92,8 +98,12 @@ export function AvailabilitySlotModal({ doctorId, doctorName }: { doctorId: stri
     try {
       await apiFetch(`/center/availability/${id}`, { method: "DELETE" })
       load()
-    } catch (err) {
-      console.error(err)
+    } catch (err: any) {
+      if (err.data?.bookings) {
+        setConflictBookings(err.data.bookings)
+      } else {
+        console.error(err)
+      }
     }
   }
 
@@ -195,6 +205,26 @@ export function AvailabilitySlotModal({ doctorId, doctorName }: { doctorId: stri
             ))}
           </div>
         </div>
+        <AlertDialog open={!!conflictBookings} onOpenChange={(o) => !o && setConflictBookings(null)}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Cannot edit — upcoming bookings exist</AlertDialogTitle>
+              <AlertDialogDescription>
+                This slot has {conflictBookings?.length} upcoming booking{conflictBookings && conflictBookings.length > 1 ? "s" : ""}. Cancel them from the Bookings page first, then try editing again.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <div className="space-y-2 my-2 max-h-40 overflow-y-auto">
+              {conflictBookings?.map((b) => (
+                <div key={b.id} className="text-sm border rounded-md p-2">
+                  <span className="font-medium">{b.patientName}</span> — {formatDate(b.date)}
+                </div>
+              ))}
+            </div>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Okay</AlertDialogCancel>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </DialogContent>
     </Dialog>
   )

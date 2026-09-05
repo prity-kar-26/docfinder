@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
 import { DesktopOnlyGuard } from "@/components/shared/DesktopOnlyGuard";
+import { Toaster } from "sonner";
 
 export const metadata: Metadata = {
   title: "DocFinder",
@@ -14,7 +15,9 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   return (
     <html lang="en" suppressHydrationWarning>
       <body>
-        <ThemeProvider>{children}</ThemeProvider>   
+        <ThemeProvider>
+          <Toaster />
+          {children}</ThemeProvider>   
         {/* <ThemeProvider>
           <DesktopOnlyGuard>{children}</DesktopOnlyGuard>
         </ThemeProvider>  - alrets to use this site on desktop if the user is on a mobile device, but this is not needed for now since the app is responsive and works on mobile */}

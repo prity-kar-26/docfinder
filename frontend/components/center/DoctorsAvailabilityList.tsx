@@ -100,6 +100,7 @@ export function DoctorsAvailabilityList() {
       .catch((err) => console.error(err))
       .finally(() => setLoading(false))
   }, [])
+  // console.log("Doctors data:", doctors)
 
   if (loading) return <p className="text-sm text-muted-foreground">Loading...</p>
   if (doctors.length === 0) return <NoDataAvailable message="No doctors listed yet. Add a doctor first." />

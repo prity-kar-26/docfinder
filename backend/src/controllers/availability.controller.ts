@@ -75,6 +75,35 @@ export const updateAvailability = async (req: AuthRequest, res: Response) => {
       return res.status(400).json({ error: "End time must be after start time" });
     }
 
+    const isChangingTime =
+      (dayOfWeek !== undefined && Number(dayOfWeek) !== slot.dayOfWeek) ||
+      (startTime && startTime !== slot.startTime) ||
+      (endTime && endTime !== slot.endTime);
+
+    if (isChangingTime) {
+      const currentTimeSlot = `${slot.startTime}-${slot.endTime}`;
+      const now = new Date();
+      const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+      const upcoming = await prisma.booking.findMany({
+        where: {
+          doctorId: slot.doctorId,
+          timeSlot: currentTimeSlot,
+          status: "BOOKED",
+          date: { gte: todayStart },
+        },
+        select: { id: true, date: true, patientName: true },
+        orderBy: { date: "asc" },
+      });
+
+      if (upcoming.length > 0) {
+        return res.status(409).json({
+          error: "This slot has upcoming bookings. Cancel them first before editing the time.",
+          bookings: upcoming,
+        });
+      }
+    }
+
     const updated = await prisma.availability.update({
       where: { id },
       data: {
@@ -101,6 +130,28 @@ export const deleteAvailability = async (req: AuthRequest, res: Response) => {
 
     const doctor = await getOwnedDoctor(req.user!.userId, slot.doctorId);
     if (!doctor) return res.status(404).json({ error: "Slot not found" });
+
+    const currentTimeSlot = `${slot.startTime}-${slot.endTime}`;
+    const now = new Date();
+    const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+    const upcoming = await prisma.booking.findMany({
+      where: {
+        doctorId: slot.doctorId,
+        timeSlot: currentTimeSlot,
+        status: "BOOKED",
+        date: { gte: todayStart },
+      },
+      select: { id: true, date: true, patientName: true },
+      orderBy: { date: "asc" },
+    });
+
+    if (upcoming.length > 0) {
+      return res.status(409).json({
+        error: "This slot has upcoming bookings. Cancel them first before deleting it.",
+        bookings: upcoming,
+      });
+    }
 
     await prisma.availability.delete({ where: { id } });
     res.status(204).send();

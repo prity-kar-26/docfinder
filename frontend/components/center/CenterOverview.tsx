@@ -59,6 +59,7 @@ export function CenterOverview() {
             .catch((err) => console.error(err))
             .finally(() => setLoading(false))
     }
+    console.log("Overview data:", data)
 
     useEffect(() => {
         load(date)
@@ -286,10 +287,11 @@ export function CenterOverview() {
                     {/* 7-day chart */}
                     <div>
                         <h2 className="text-lg font-semibold mb-3">Bookings & Earnings — Last 7 Days</h2>
-                        <Card className="p-4">
-                            {!hasChartActivity ? (
-                                <NoDataAvailable message="No bookings or earnings in the last 7 days." />
-                            ) : (
+                        {!hasChartActivity ? (
+                            <NoDataAvailable message="No bookings or earnings in the last 7 days." />
+                        ) : (
+                            <Card className="p-4">
+
                                 <ResponsiveContainer width="100%" height={280}>
                                     <BarChart data={data.chartData}>
                                         <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
@@ -302,8 +304,9 @@ export function CenterOverview() {
                                         <Bar yAxisId="right" dataKey="earnings" fill="#16a34a" radius={[4, 4, 0, 0]} name="Earnings (₹)" />
                                     </BarChart>
                                 </ResponsiveContainer>
-                            )}
-                        </Card>
+
+                            </Card>
+                        )}
                     </div>
                 </div>
             )}

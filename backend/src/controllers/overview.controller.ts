@@ -1,6 +1,7 @@
 import { Response } from "express";
 import { prisma } from "../utils/prisma";
 import { AuthRequest } from "../middleware/auth.middleware";
+import { parseDateOnly } from "../utils/date";
 
 async function getCenterId(userId: string) {
   const profile = await prisma.centerProfile.findUnique({ where: { userId } });
@@ -21,7 +22,8 @@ export const getOverview = async (req: AuthRequest, res: Response) => {
 
     const now = new Date();
     const dateParam = (req.query.date as string) || toISO(now);
-    const selectedDate = new Date(dateParam);
+    // const selectedDate = new Date(dateParam);
+    const selectedDate = parseDateOnly(dateParam);
     const dayStart = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), selectedDate.getDate());
     const dayEnd = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), selectedDate.getDate(), 23, 59, 59);
     const selectedDow = selectedDate.getDay();

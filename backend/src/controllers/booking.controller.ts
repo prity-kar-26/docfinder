@@ -1,6 +1,7 @@
 import { Response } from "express";
 import { prisma } from "../utils/prisma";
 import { AuthRequest } from "../middleware/auth.middleware";
+import { parseDateOnly } from "../utils/date";
 
 function sameDate(a: Date, b: Date) {
   return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
@@ -25,7 +26,8 @@ export const createBooking = async (req: AuthRequest, res: Response) => {
       return res.status(400).json({ error: "Invalid time slot" });
     }
 
-    const pickedDate = new Date(date);
+    // const pickedDate = new Date(date);
+    const pickedDate = parseDateOnly(date);
     if (pickedDate.getDay() !== slot.dayOfWeek) {
       return res.status(400).json({ error: "Selected date does not match this slot's day of the week" });
     }

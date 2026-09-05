@@ -14,6 +14,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import { Plus } from "lucide-react"
+import { toast } from "sonner"
 
 type Doctor = {
   id: string
@@ -62,6 +63,7 @@ export function AddDoctorModal({ onAdded }: { onAdded: (doctor: Doctor) => void 
       onAdded(doctor)
       reset()
       setOpen(false)
+      toast.success("Doctor added successfully")
     } catch (err: any) {
       setError(err.message || "Failed to add doctor")
     } finally {
